@@ -5,6 +5,7 @@ const app = express();
 const port = 6000;
 const mongoose = require("mongoose");
 const adminroute = require("./Routes/Adminrout");
+const userroute=require("./Routes/userRouter")
 
 // connection to mongoDB {start}
 const mongoDB = "mongodb://127.0.0.1:27017/E-commerce-fullstack";
@@ -17,6 +18,7 @@ async function main() {
 // {end}
 app.use(express.json());
 app.use("/api/admin", adminroute);
+app.use("/api/users",userroute)
 
 // defining server where to listen{port}
 app.listen(port, (err) => {

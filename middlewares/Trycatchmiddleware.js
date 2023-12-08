@@ -9,7 +9,7 @@ const TrycatchMiddleware = (TrycatchHandler) => {
         error_message: error.message,
       });
     }
-    next();  
+    next();
   };
 };
 module.exports = TrycatchMiddleware;

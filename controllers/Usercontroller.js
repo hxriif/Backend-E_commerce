@@ -37,7 +37,7 @@ module.exports = {
   },
 
   userlogin: async (req, res) => {
-    const { value, error } =userjoiSchema.validate(req.body);
+    const { value, error } = userjoiSchema.validate(req.body);
     if (error) {
       return res.json(error.message);
     }
