@@ -6,4 +6,13 @@ const userjoiSchema = joi.object({
   password: joi.string().required(),
 });
 
-module.exports = { userjoiSchema };
+const ProductJoiSchema=joi.object({
+  id: joi.string(),
+  title: joi.string().required(),
+  image: joi.string(),
+  price: joi.number().positive(),
+  category: joi.string(),
+  description: joi.string(),
+});
+
+module.exports = { userjoiSchema,ProductJoiSchema};

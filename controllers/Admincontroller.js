@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken");
 const userdatabase = require("../models/userSchema");
+const products = require("../models/productSchema");
+const { ProductJoiSchema } = require("../models/validationSchema");
 
 module.exports = {
   // Admin login
 
   login: async (req, res) => {
     const { email, password } = req.body;
+    console.log(email);
     if (
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
@@ -37,5 +40,42 @@ module.exports = {
         data: allusers,
       });
     }
+  },
+
+  getUserById: async (req, res) => {
+    const userId = req.params.id;
+    // console.log(userId)
+    const user = await userdatabase.findById(userId);
+    console.log(user);
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "user successfully found",
+      data: { user },
+    });
+  },
+  addProduct: async (req, res) => {
+    const { value, error } = ProductJoiSchema.validate(req.body);
+    if (error) {
+      res.status(404).json({ error: error.details[0].message });
+    }
+    const { title, description, category, price, image } = value;
+    await products.create({
+      title,
+      description,
+      category,
+      price,
+      image,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "product added successfully",
+      data: products,
+    });
   },
 };
