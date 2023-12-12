@@ -65,7 +65,7 @@ module.exports = {
       res.status(404).json({ error: error.details[0].message });
     }
     const { title, description, category, price, image } = value;
-    await products.create({
+    const newproducts = await products.create({
       title,
       description,
       category,
@@ -75,7 +75,7 @@ module.exports = {
     res.status(200).json({
       status: "success",
       message: "product added successfully",
-      data: products,
+      data: newproducts,
     });
   },
 };

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const userschema = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const { userjoiSchema } = require("../models/validationSchema");
+const Products = require("../models/productSchema");
 
 module.exports = {
   userRegister: async (req, res) => {
@@ -93,5 +94,19 @@ module.exports = {
         message: "Internal Server Error",
       });
     }
+  },
+  userViewProduct: async (req, res) => {
+    const products = await Products.find()
+    // console.log(products)
+    if (!products) {
+      return res.status(404).json({
+        status: "error",
+        message: "not found"
+      })
+    }   
+    return res.status(200).json({
+      status: "success",
+      message: "product fetched successfully"
+    })
   },
 };
