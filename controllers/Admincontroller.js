@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
 const userdatabase = require("../models/userSchema");
-const products = require("../models/productSchema");
+// const products = require("../models/productSchema");
+const Products = require("../models/productSchema");
 const { ProductJoiSchema } = require("../models/validationSchema");
+const mongoose = require("mongoose");
 
 module.exports = {
   // Admin login
@@ -59,23 +61,62 @@ module.exports = {
       data: { user },
     });
   },
+
   addProduct: async (req, res) => {
+    // const { value, error } = ProductJoiSchema.validate(req.body);
     const { value, error } = ProductJoiSchema.validate(req.body);
+    // console.log(value)
     if (error) {
-      res.status(404).json({ error: error.details[0].message });
+      return res.status(404).json({ error: error.details[0].message });
     }
     const { title, description, category, price, image } = value;
-    const newproducts = await products.create({
+    console.log();
+    await Products.create({
       title,
       description,
       category,
       price,
       image,
     });
-    res.status(200).json({
+    return res.status(201).json({
       status: "success",
       message: "product added successfully",
-      data: newproducts,
+      data: Products,
+    });
+  },
+  deleteproduct: async (req, res) => {
+    const { productId } = req.body;
+
+    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(404).json({
+        status: "error",
+        message: "Invalid product Id provided",
+      });
+    }
+    const deleteproduct = await Products.findOneAndDelete({ _id: productId });
+    if (!deleteproduct) {
+      return res.status(404).json({
+        status: "error",
+        message: "Product Not Found in Database",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "product deleted successfully",
+    });
+  },
+  allproducts: async (req, res) => {
+    const productsList = await Products.find();
+    if (!productsList) {
+      res.status(404).json({
+        status: "error",
+        message: "Products not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "All product details fetched successfully",
+      data: productsList,
     });
   },
 };

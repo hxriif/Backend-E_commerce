@@ -15,8 +15,10 @@ router.post("/login", TrycatchMiddleware(admincontroller.login))
 
 .get("/users",TrycatchMiddleware(admincontroller.allusers))
 .get("/users/:id",TrycatchMiddleware(admincontroller.getUserById))
-.post("/addProduct",TrycatchMiddleware(admincontroller.addProduct))
+.post("/Productadd",TrycatchMiddleware(admincontroller.addProduct))
+.delete("/delete",TrycatchMiddleware(admincontroller.deleteproduct))
+.get("/products",TrycatchMiddleware(admincontroller.allproducts))
 
 
-module.exports = router;      
+module.exports = router;         
    
