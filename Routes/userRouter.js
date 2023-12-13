@@ -11,5 +11,6 @@ router
 .use(userVerifyToken)
 
 .get("/products",TryCatchMiddleware(Usercontroller.userViewProduct))
+.get("/view/:id",TryCatchMiddleware(Usercontroller.productById))
 
 module.exports = router;

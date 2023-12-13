@@ -96,18 +96,35 @@ module.exports = {
     }
   },
   userViewProduct: async (req, res) => {
-    const products = await Products.find()
+    const products = await Products.find();
     // console.log(products)
     if (!products) {
       return res.status(404).json({
         status: "error",
-        message: "not found"
-      })
-    }   
+        message: "not found",
+      });
+    }
     return res.status(200).json({
       status: "success",
       message: "product fetched successfully",
-      data:products
-    })
+      data: products,
+    });
+  },
+
+  productById: async (req, res) => {
+    const productId = req.params.id;
+    const prdt = await Products.findById(productId);
+    // console.log(prdt);
+    if (!prdt) {
+      res.status(404).json({
+        status: "error",
+        message: "product not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "product fetched successfully✅",
+      data: prdt,
+    });
   },
 };

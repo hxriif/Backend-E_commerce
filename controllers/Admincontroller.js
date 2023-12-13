@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const userdatabase = require("../models/userSchema");
-// const products = require("../models/productSchema");
 const Products = require("../models/productSchema");
 const { ProductJoiSchema } = require("../models/validationSchema");
 const mongoose = require("mongoose");
@@ -117,6 +116,37 @@ module.exports = {
       status: "success",
       message: "All product details fetched successfully",
       data: productsList,
+    });
+  },
+  adminUpdate: async (req, res) => {
+    const { value, error } = ProductJoiSchema.validate(req.body);
+    if (error) {
+      return res.status(404).json({
+        status: "error",
+        message: error.details[0].message,
+      });
+    }
+    const { id, title, image, price, category, description } = value;
+    const product = await Products.find();
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: "product not found in database",
+      });
+    }
+    await Products.findByIdAndUpdate(
+      { _id: id },
+      {     
+        title,
+        image,
+        price,
+        category,
+        description,
+      }
+    );
+    res.status(200).json({
+      status: "success",
+      message: "product updated successfully",
     });
   },
 };
