@@ -12,5 +12,7 @@ router
 
 .get("/products",TryCatchMiddleware(Usercontroller.userViewProduct))
 .get("/view/:id",TryCatchMiddleware(Usercontroller.productById))
+.get("/products/category/:categoryname",TryCatchMiddleware(Usercontroller.productByCategory))
 
 module.exports = router;
+       

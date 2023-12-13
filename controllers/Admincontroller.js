@@ -125,7 +125,7 @@ module.exports = {
         status: "error",
         message: error.details[0].message,
       });
-    }
+    }   
     const { id, title, image, price, category, description } = value;
     const product = await Products.find();
     if (!product) {
@@ -149,4 +149,4 @@ module.exports = {
       message: "product updated successfully",
     });
   },
-};
+};   

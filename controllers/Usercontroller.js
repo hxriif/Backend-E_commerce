@@ -3,6 +3,8 @@ const userschema = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const { userjoiSchema } = require("../models/validationSchema");
 const Products = require("../models/productSchema");
+// const { objectId } = require("mongoose").Types;
+// const { isValidObjectId } = require("mongoose");
 
 module.exports = {
   userRegister: async (req, res) => {
@@ -127,4 +129,21 @@ module.exports = {
       data: prdt,
     });
   },
+  productByCategory: async (req, res) => {
+    const productcategory = req.params.categoryname;
+    const prdct = await Products.find({ category: productcategory });
+    console.log(prdct);
+    if (!prdct) {
+      res.status(404).json({
+        status: "error",
+        message: "category not found ",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "product category fetched✅",
+      data: { prdct },
+    });
+  },
+ 
 };

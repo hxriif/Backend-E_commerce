@@ -8,7 +8,7 @@ const userjoiSchema = joi.object({
 
 const ProductJoiSchema=joi.object({
   id: joi.string(),
-  title: joi.string().required(),
+  title: joi.string(),
   image: joi.string(),
   price: joi.number().positive(),
   category: joi.string(),
