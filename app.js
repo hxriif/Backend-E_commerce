@@ -14,15 +14,15 @@ main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect(mongoDB);
   console.log("mongoDB connected");
-}
+}       
 // {end}
-app.use(express.json());
+app.use(express.json());     
 app.use("/api/admin", adminroute);
 app.use("/api/users",userroute)
 
 // defining server where to listen{port}
 app.listen(port, (err) => {
-  if (err) {
+  if (err) {     
     console.log(`error detected ${err}`);
   }
   console.log(`server is running on port${port}`);

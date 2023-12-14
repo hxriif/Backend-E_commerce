@@ -4,12 +4,13 @@ const bcrypt = require("bcrypt");
 const { userjoiSchema } = require("../models/validationSchema");
 const Products = require("../models/productSchema");
 const { ObjectId } = require("mongoose").Types;
+const cookie = require("cookie");
 
 module.exports = {
   userRegister: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
     // console.log(value)
-    if (error) {   
+    if (error) {
       return (
         res.status(400),
         json({
@@ -40,7 +41,7 @@ module.exports = {
 
   userlogin: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
-    console.log(value)
+    console.log(value);
     if (error) {
       return res.json(error.message);
     }
@@ -50,7 +51,7 @@ module.exports = {
     try {
       const user = await userschema.findOne({
         email: email,
-      });
+      });  
 
       if (!user) {
         return res.status(404).json({
@@ -82,6 +83,14 @@ module.exports = {
         {
           expiresIn: 8500,
         }
+      );
+      res.setHeader(
+        "Set-Cookie",
+        cookie.serialize("token", Token, {
+          httpOnly: true,
+          maxAge: 8500, // seconds
+          path: "/",
+        })
       );
 
       res.status(200).json({
@@ -115,9 +124,8 @@ module.exports = {
 
   productById: async (req, res) => {
     const productId = req.params.id;
-    const prdt = await Products.findById(productId);
-    // console.log(prdt);
-    if (!prdt) {
+    const product = await Products.findById(productId);
+    if (!product) {
       res.status(404).json({
         status: "error",
         message: "product not found",
@@ -126,14 +134,14 @@ module.exports = {
     res.status(200).json({
       status: "success",
       message: "product fetched successfully✅",
-      data: prdt,
+      data: product,
     });
   },
   productByCategory: async (req, res) => {
     const productcategory = req.params.categoryname;
-    const prdct = await Products.find({ category: productcategory });
+    const product = await Products.find({ category: productcategory });
     console.log(prdct);
-    if (!prdct) {
+    if (!product) {
       res.status(404).json({
         status: "error",
         message: "category not found ",
@@ -142,7 +150,7 @@ module.exports = {
     res.status(200).json({
       status: "success",
       message: "product category fetched✅",
-      data: { prdct },
+      data: { product },
     });
   },
   addToCart: async (req, res) => {
@@ -156,7 +164,7 @@ module.exports = {
       });
     }
     const { producId } = req.body;
-    
+
     if (!producId) {
       res.status({
         status: "error",
