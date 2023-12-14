@@ -11,7 +11,6 @@ const userschema = new mongoose.Schema({
 cart: [
   {
     productsId: { type: mongoose.Schema.ObjectId, ref: "products" },
-    quantity: { type: Number, default: 1 },
   },
 ],
   userschema.pre("save", async function (next) {

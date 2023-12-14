@@ -3,14 +3,13 @@ const userschema = require("../models/userSchema");
 const bcrypt = require("bcrypt");
 const { userjoiSchema } = require("../models/validationSchema");
 const Products = require("../models/productSchema");
-// const { objectId } = require("mongoose").Types;
-// const { isValidObjectId } = require("mongoose");
+const { ObjectId } = require("mongoose").Types;
 
 module.exports = {
   userRegister: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
     // console.log(value)
-    if (error) {
+    if (error) {   
       return (
         res.status(400),
         json({
@@ -41,6 +40,7 @@ module.exports = {
 
   userlogin: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
+    console.log(value)
     if (error) {
       return res.json(error.message);
     }
@@ -145,5 +145,41 @@ module.exports = {
       data: { prdct },
     });
   },
- 
+  addToCart: async (req, res) => {
+    const userId = req.params.id;
+    const user = await userschema.findById(userId);
+
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    const { producId } = req.body;
+    
+    if (!producId) {
+      res.status({
+        status: "error",
+        message: "product not found",
+      });
+    }
+    const productObject = {
+      productsId: new ObjectId(producId),
+    };
+    try {
+      await userschema.updateOne(
+        { _id: user._id },
+        { $push: { cart: productObject } }
+      );
+      res.status(200).json({
+        status: "success",
+        message: "successfully product added to cart",
+      });
+    } catch {
+      res.status(500).json({
+        status: "error",
+        message: "internal server error",
+      });
+    }
+  },
 };

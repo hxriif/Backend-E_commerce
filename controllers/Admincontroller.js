@@ -62,37 +62,49 @@ module.exports = {
   },
 
   addProduct: async (req, res) => {
-    // const { value, error } = ProductJoiSchema.validate(req.body);
-    const { value, error } = ProductJoiSchema.validate(req.body);
-    // console.log(value)
+    
+    const { value, error } =   ProductJoiSchema.validate(req.body);
+    console.log(req.body);
+    
+   
     if (error) {
-      return res.status(404).json({ error: error.details[0].message });
+      return res.status(400).json({ error: error.details[0].message });
     }
     const { title, description, category, price, image } = value;
-    console.log();
-    await Products.create({
-      title,
-      description,
-      category,
-      price,
-      image,
-    });
-    return res.status(201).json({
-      status: "success",
-      message: "product added successfully",
-      data: Products,
-    });
+    // console.log("value",value);
+    try {
+      const createproduct = await Products.create({
+        title,
+        description,
+        category,
+        price,
+        image,
+      });
+      console.log("create",createproduct);
+      return res.status(201).json({
+        status: "success",
+        message: "product added successfully",
+        data: createproduct,
+      });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      return res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+      });
+    }
   },
   deleteproduct: async (req, res) => {
-    const { productId } = req.body;
+    const  Id  = req.params.id;
+    console.log(Id);
 
-    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+    if (!Id || !mongoose.Types.ObjectId.isValid(Id)) {
       return res.status(404).json({
         status: "error",
         message: "Invalid product Id provided",
       });
     }
-    const deleteproduct = await Products.findOneAndDelete({ _id: productId });
+    const deleteproduct = await Products.findOneAndDelete({ _id: Id });
     if (!deleteproduct) {
       return res.status(404).json({
         status: "error",
@@ -125,7 +137,7 @@ module.exports = {
         status: "error",
         message: error.details[0].message,
       });
-    }   
+    }
     const { id, title, image, price, category, description } = value;
     const product = await Products.find();
     if (!product) {
@@ -136,7 +148,7 @@ module.exports = {
     }
     await Products.findByIdAndUpdate(
       { _id: id },
-      {     
+      {
         title,
         image,
         price,
@@ -149,4 +161,4 @@ module.exports = {
       message: "product updated successfully",
     });
   },
-};   
+};
