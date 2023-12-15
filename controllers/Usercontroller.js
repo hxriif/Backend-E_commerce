@@ -51,7 +51,7 @@ module.exports = {
     try {
       const user = await userschema.findOne({
         email: email,
-      });  
+      });
 
       if (!user) {
         return res.status(404).json({
@@ -88,7 +88,7 @@ module.exports = {
         "Set-Cookie",
         cookie.serialize("token", Token, {
           httpOnly: true,
-          maxAge: 8500, // seconds
+          maxAge: 8500,
           path: "/",
         })
       );
@@ -139,8 +139,9 @@ module.exports = {
   },
   productByCategory: async (req, res) => {
     const productcategory = req.params.categoryname;
+    console.log(productcategory);
     const product = await Products.find({ category: productcategory });
-    console.log(prdct);
+    console.log(product);
     if (!product) {
       res.status(404).json({
         status: "error",
@@ -189,5 +190,31 @@ module.exports = {
         message: "internal server error",
       });
     }
+  },
+  viewcart: async (req, res) => {
+    const UserId = req.params.id;
+    const user = await userschema.findById(UserId);
+    console.log(user)
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found ",
+      });
+    }    
+    const userProductId = user.cart;
+    if (userProductId.length === 0) {
+      res.status(200).json({
+        stauts: "success",
+        message: "user cart is empty",
+        data: [],
+      });
+    }
+    const cartproducts = await userschema.findOne({ _id:UserId }).populate("cart.productsId");
+    console.log(cartproducts)
+    res.status(200).json({
+      status: "success",
+      message: "cart product fetched successfully",
+      data: cartproducts,
+    });
   },
 };

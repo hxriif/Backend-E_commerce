@@ -12,9 +12,10 @@ router
 
 .get("/products",TryCatchMiddleware(Usercontroller.userViewProduct))
 .get("/view/:id",TryCatchMiddleware(Usercontroller.productById))
-.get("/products/category/:categoryname",TryCatchMiddleware(Usercontroller.productByCategory))
+.get("/products/:categoryname",TryCatchMiddleware(Usercontroller.productByCategory))
 .post("/:id/cart",TryCatchMiddleware(Usercontroller.addToCart))
+.get("/:id/cart",TryCatchMiddleware(Usercontroller.viewcart))
 
 
 module.exports = router;
-       
+                
