@@ -11,6 +11,7 @@ const userschema = new mongoose.Schema({
       productsId: { type: mongoose.Schema.ObjectId, ref: "products" },
     },
   ],
+  wishlist: [{ type: mongoose.Schema.ObjectId, ref: "products" }],
 });
 
 userschema.pre("save", async function (next) {

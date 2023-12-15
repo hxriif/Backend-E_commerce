@@ -9,7 +9,6 @@ const cookie = require("cookie");
 module.exports = {
   userRegister: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
-    // console.log(value)
     if (error) {
       return (
         res.status(400),
@@ -41,7 +40,6 @@ module.exports = {
 
   userlogin: async (req, res) => {
     const { value, error } = userjoiSchema.validate(req.body);
-    console.log(value);
     if (error) {
       return res.json(error.message);
     }
@@ -99,7 +97,6 @@ module.exports = {
         data: { id, email, Token },
       });
     } catch (error) {
-      console.error(error);
       res.status(500).json({
         status: "error",
         message: "Internal Server Error",
@@ -108,7 +105,6 @@ module.exports = {
   },
   userViewProduct: async (req, res) => {
     const products = await Products.find();
-    // console.log(products)
     if (!products) {
       return res.status(404).json({
         status: "error",
@@ -139,9 +135,7 @@ module.exports = {
   },
   productByCategory: async (req, res) => {
     const productcategory = req.params.categoryname;
-    console.log(productcategory);
     const product = await Products.find({ category: productcategory });
-    console.log(product);
     if (!product) {
       res.status(404).json({
         status: "error",
@@ -167,7 +161,7 @@ module.exports = {
     const { producId } = req.body;
 
     if (!producId) {
-      res.status({
+      res.status(404).json({
         status: "error",
         message: "product not found",
       });
@@ -194,13 +188,12 @@ module.exports = {
   viewcart: async (req, res) => {
     const UserId = req.params.id;
     const user = await userschema.findById(UserId);
-    console.log(user)
     if (!user) {
       res.status(404).json({
         status: "error",
         message: "user not found ",
       });
-    }    
+    }
     const userProductId = user.cart;
     if (userProductId.length === 0) {
       res.status(200).json({
@@ -209,12 +202,74 @@ module.exports = {
         data: [],
       });
     }
-    const cartproducts = await userschema.findOne({ _id:UserId }).populate("cart.productsId");
-    console.log(cartproducts)
+    const cartproducts = await userschema
+      .findOne({ _id: UserId })
+      .populate("cart.productsId");
     res.status(200).json({
       status: "success",
       message: "cart product fetched successfully",
       data: cartproducts,
+    });
+  },
+  AddToWishlist: async (req, res) => {
+    const userId = req.params.id;
+    if (!userId) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    const { productId } = req.body;
+    const products = await Products.findById(productId);
+    if (!products) {
+      res.status(404).json({
+        status: "error",
+        message: "product not found", 
+      });
+    }
+    const productsFind = await userschema.findOne({
+      _id: userId,  
+      wishlist: productId,
+    });
+    if (productsFind) {
+     return res.status(200).json({
+        status: "success",
+        message: "product already in wishlist",
+      });
+    }
+    await userschema.updateOne(
+      { _id: userId },
+      { $push: { wishlist: productId } }
+    );
+    res.status(200).json({
+      status: "success",   
+      messsage: "successfully product added to wishlist",
+    });
+  },
+  viewwishlist: async (req, res) => {
+    const userId = req.params.id;
+    const user = await userschema.findById(userId);
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    const wishlistproductId = user.wishlist;
+    if (wishlistproductId.length === 0) {
+      res.status(404).json({
+        status: "success",
+        message: "empty wishlist",
+        data: [],
+      });    
+    }
+    const wishlistproduct = await Products.find({
+      _id: { $in: wishlistproductId },
+    });
+    res.status(200).json({
+      status: "success",
+      message: "wishlist product fetched successfully",
+      data: wishlistproduct,
     });
   },
 };

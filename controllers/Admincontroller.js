@@ -37,16 +37,14 @@ module.exports = {
       res.status(200).json({
         status: "success",
         message: "successfully fetched user data",
-        data: allusers,
+        data: allusers,     
       });
     }
   },
 
   getUserById: async (req, res) => {
     const userId = req.params.id;
-    // console.log(userId)
     const user = await userdatabase.findById(userId);
-    console.log(user);
     if (!user) {
       res.status(404).json({
         status: "error",
@@ -61,16 +59,12 @@ module.exports = {
   },
 
   addProduct: async (req, res) => {
-    
-    const { value, error } =   ProductJoiSchema.validate(req.body);
-    console.log(req.body);
-    
-   
+    const { value, error } = ProductJoiSchema.validate(req.body);
+
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }
     const { title, description, category, price, image } = value;
-    // console.log("value",value);
     try {
       const createproduct = await Products.create({
         title,
@@ -79,7 +73,7 @@ module.exports = {
         price,
         image,
       });
-      console.log("create",createproduct);
+      console.log("create", createproduct);
       return res.status(201).json({
         status: "success",
         message: "product added successfully",
@@ -94,7 +88,7 @@ module.exports = {
     }
   },
   deleteproduct: async (req, res) => {
-    const  Id  = req.params.id;
+    const Id = req.params.id;
     console.log(Id);
 
     if (!Id || !mongoose.Types.ObjectId.isValid(Id)) {

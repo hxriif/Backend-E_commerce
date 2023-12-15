@@ -15,7 +15,9 @@ router
 .get("/products/:categoryname",TryCatchMiddleware(Usercontroller.productByCategory))
 .post("/:id/cart",TryCatchMiddleware(Usercontroller.addToCart))
 .get("/:id/cart",TryCatchMiddleware(Usercontroller.viewcart))
+.post("/:id/wishlists",TryCatchMiddleware(Usercontroller.AddToWishlist))
+.get("/:id/viewWishlist",TryCatchMiddleware(Usercontroller.viewwishlist))
 
 
-module.exports = router;
+module.exports = router;    
                 
