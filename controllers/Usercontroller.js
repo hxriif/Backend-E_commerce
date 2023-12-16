@@ -272,4 +272,26 @@ module.exports = {
       data: wishlistproduct,
     });
   },
+  deleteWishlist:async (req,res)=>{
+    const userId=req.params.id
+    const user=await userschema.findById(userId)
+    if(!user){
+      res.status(404).json({
+        status:"error",
+        message:"user not found"
+      })
+    }
+    const {productId}=req.body;
+    if(!productId){
+      res.status(404).json({
+        status:"error",
+        message:"product not found"
+      })
+    }
+    await userschema.updateOne({_id:userId},{$pull:{wishlist:productId}})
+    res.status(200).json({
+      status:"success",
+      message:"product succesfully removed from wishlist "
+    })
+  },
 };

@@ -5,8 +5,6 @@ const { ProductJoiSchema } = require("../models/validationSchema");
 const mongoose = require("mongoose");
 
 module.exports = {
-  // Admin login
-
   login: async (req, res) => {
     const { email, password } = req.body;
     if (
@@ -41,7 +39,6 @@ module.exports = {
       });
     }
   },
-
   getUserById: async (req, res) => {
     const userId = req.params.id;
     const user = await userdatabase.findById(userId);
@@ -57,7 +54,6 @@ module.exports = {
       data: { user },
     });
   },
-
   addProduct: async (req, res) => {
     const { value, error } = ProductJoiSchema.validate(req.body);
 
@@ -154,4 +150,5 @@ module.exports = {
       message: "product updated successfully",
     });
   },
+  
 };
