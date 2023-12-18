@@ -12,6 +12,7 @@ const userschema = new mongoose.Schema({
     },
   ],
   wishlist: [{ type: mongoose.Schema.ObjectId, ref: "products" }],
+  orders: [{ type: mongoose.Schema.ObjectId, ref: "orders" }],
 });
 
 userschema.pre("save", async function (next) {

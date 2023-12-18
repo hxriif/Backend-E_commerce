@@ -6,6 +6,7 @@ const Products = require("../models/productSchema");
 const { ObjectId } = require("mongoose").Types;
 const cookie = require("cookie");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const order = require("../models/orderSchema");
 let Svalue = {};
 
 module.exports = {
@@ -312,7 +313,7 @@ module.exports = {
     }
     const cartproducts = user.cart;
     if (cartproducts.length === 0) {
-     return  res.status(204).json({
+      return res.status(204).json({
         status: "success",
         message: "user cart is empty",
         data: [],
@@ -354,5 +355,44 @@ module.exports = {
       message: "Strip  payment session created successfully",
       url: session.url,
     });
+  },
+  success: async (req, res) => {
+    const { user, Id, session } = Svalue;
+    const userId = user.id;
+    const cartItems = user.cart;
+    const productitems = cartItems.map((item) => item.productsId);
+
+    const orders = await order.create({
+      userId: Id,
+      product: productitems,
+      order_id: session.id,
+      payment_id: `demo ${Date.now()}`,
+      total_amount: session.amount_total / 100,
+    });
+    if (!orders) {
+      return res.json({ message: "error occured while inputing to orderDB" });
+    }
+
+    const orderId = orders._id;
+
+    const userupdate = await userschema.updateOne(
+      { _id: userId },
+      {
+        $push: { orders: orderId },
+        $set: { cart: [] },
+      }
+    );
+
+    if (userupdate) {
+      res.status(200).json({
+        status: "Success",
+        message: "Payment Successful.",
+      });
+    } else {
+      res.status(500).json({
+        status: "Error",
+        message: "Failed to update user data.",
+      });
+    }
   },
 };

@@ -19,6 +19,8 @@ router
 .get("/:id/viewWishlist",TryCatchMiddleware(Usercontroller.viewwishlist))
 .delete("/:id/removewishlist",TryCatchMiddleware(Usercontroller.deleteWishlist))
 .post("/:id/payment",TryCatchMiddleware(Usercontroller.paymet))
+.get("/payment/success",TryCatchMiddleware(Usercontroller.success))
+
 
 
 module.exports = router;    
