@@ -5,6 +5,8 @@ const { userjoiSchema } = require("../models/validationSchema");
 const Products = require("../models/productSchema");
 const { ObjectId } = require("mongoose").Types;
 const cookie = require("cookie");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+let Svalue = {};
 
 module.exports = {
   userRegister: async (req, res) => {
@@ -224,15 +226,15 @@ module.exports = {
     if (!products) {
       res.status(404).json({
         status: "error",
-        message: "product not found", 
+        message: "product not found",
       });
     }
     const productsFind = await userschema.findOne({
-      _id: userId,  
+      _id: userId,
       wishlist: productId,
     });
     if (productsFind) {
-     return res.status(200).json({
+      return res.status(200).json({
         status: "success",
         message: "product already in wishlist",
       });
@@ -242,7 +244,7 @@ module.exports = {
       { $push: { wishlist: productId } }
     );
     res.status(200).json({
-      status: "success",   
+      status: "success",
       messsage: "successfully product added to wishlist",
     });
   },
@@ -261,7 +263,7 @@ module.exports = {
         status: "success",
         message: "empty wishlist",
         data: [],
-      });    
+      });
     }
     const wishlistproduct = await Products.find({
       _id: { $in: wishlistproductId },
@@ -272,26 +274,85 @@ module.exports = {
       data: wishlistproduct,
     });
   },
-  deleteWishlist:async (req,res)=>{
-    const userId=req.params.id
-    const user=await userschema.findById(userId)
-    if(!user){
+  deleteWishlist: async (req, res) => {
+    const userId = req.params.id;
+    const user = await userschema.findById(userId);
+    if (!user) {
       res.status(404).json({
-        status:"error",
-        message:"user not found"
-      })
+        status: "error",
+        message: "user not found",
+      });
     }
-    const {productId}=req.body;
-    if(!productId){
+    const { productId } = req.body;
+    if (!productId) {
       res.status(404).json({
-        status:"error",
-        message:"product not found"
-      })
+        status: "error",
+        message: "product not found",
+      });
     }
-    await userschema.updateOne({_id:userId},{$pull:{wishlist:productId}})
+    await userschema.updateOne(
+      { _id: userId },
+      { $pull: { wishlist: productId } }
+    );
     res.status(200).json({
-      status:"success",
-      message:"product succesfully removed from wishlist "
-    })
+      status: "success",
+      message: "product succesfully removed from wishlist ",
+    });
+  },
+  paymet: async (req, res) => {
+    const userId = req.parmas.id;
+    const user = await userschema.findOne(
+      { _id: userId }.populate("cart.productsId")
+    );
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    const cartproducts = user.cart;
+    if (cartproducts.length === 0) {
+     return  res.status(204).json({
+        status: "success",
+        message: "user cart is empty",
+        data: [],
+      });
+    }
+    const lineItmes = cartproducts.map((item) => {
+      return {
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: item.productsId.title,
+            description: item.productsId.description,
+          },
+          unit_amount: Math.round(item.productsId.price * 100),
+        },
+        quantity: 1,
+      };
+    });
+    session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItmes,
+      mode: "payment",
+      success_url: `http://localhost:3000/api/users/payment/success`, // Replace with your success URL
+      cancel_url: "http://localhost:3000/api/users/payment/cancel", // Replace with your cancel URL
+    });
+    if (!session) {
+      return res.json({
+        status: "Failure",
+        message: " Error occured on Session side",
+      });
+    }
+    Svalue = {
+      userId,
+      user,
+      session,
+    };
+    res.status(200).json({
+      status: "success",
+      message: "Strip  payment session created successfully",
+      url: session.url,
+    });
   },
 };
