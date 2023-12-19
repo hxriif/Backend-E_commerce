@@ -18,8 +18,9 @@ router
 .post("/:id/wishlists",TryCatchMiddleware(Usercontroller.AddToWishlist))
 .get("/:id/viewWishlist",TryCatchMiddleware(Usercontroller.viewwishlist))
 .delete("/:id/removewishlist",TryCatchMiddleware(Usercontroller.deleteWishlist))
-.post("/:id/payment",TryCatchMiddleware(Usercontroller.paymet))
+.post("/:id/payment",TryCatchMiddleware(Usercontroller.payment))
 .get("/payment/success",TryCatchMiddleware(Usercontroller.success))
+.post("/payment/cancel",TryCatchMiddleware(Usercontroller.cancel))
 
 
 
