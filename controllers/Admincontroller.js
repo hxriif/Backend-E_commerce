@@ -3,6 +3,7 @@ const userdatabase = require("../models/userSchema");
 const Products = require("../models/productSchema");
 const { ProductJoiSchema } = require("../models/validationSchema");
 const mongoose = require("mongoose");
+const orderSchema = require("../models/orderSchema");
 
 module.exports = {
   login: async (req, res) => {
@@ -35,7 +36,7 @@ module.exports = {
       res.status(200).json({
         status: "success",
         message: "successfully fetched user data",
-        data: allusers,     
+        data: allusers,
       });
     }
   },
@@ -150,5 +151,48 @@ module.exports = {
       message: "product updated successfully",
     });
   },
-  
+  adminOrderDetails: async (req, res) => {
+    const products = await orderSchema.find();
+    if (products.length === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "no order details",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "product fetched successfully",
+      data: products,
+    });
+  },
+  status: async (req, res) => {
+    const totalRevenue = await orderSchema.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalProduct: { $sum: { $size: "$products" } },
+          totalRevenue: { $sum: "$total_amount" },
+        },
+      },
+    ]);
+
+    // Handle the case where there are no documents
+    const result =
+      totalRevenue.length > 0
+        ? totalRevenue[0]
+        : { totalProduct: 0, totalRevenue: 0 };
+
+    if (totalRevenue.length > 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "totalRevenue",
+        data: totalRevenue[0],
+      });
+    } else {
+      return res.status(200).json({
+        status: "Success",
+        data: { totalProduct: 0, totalRevenue: 0 },
+      });
+    }
+  },
 };

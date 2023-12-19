@@ -302,14 +302,16 @@ module.exports = {
   },
   payment: async (req, res) => {
     const userId = req.params.id;
-    const user = await userschema.findOne({ _id: userId }).populate("cart.productsId");
+    const user = await userschema
+      .findOne({ _id: userId })
+      .populate("cart.productsId");
     if (!user) {
       res.status(404).json({
         status: "error",
         message: "user not found",
       });
-    }  
-    const cartproducts = user.cart;   
+    }
+    const cartproducts = user.cart;
     if (cartproducts.length === 0) {
       return res.status(204).json({
         status: "success",
@@ -324,7 +326,7 @@ module.exports = {
           product_data: {
             name: item.productsId.title,
             description: item.productsId.description,
-            image:item.productsId.image,
+            image: item.productsId.image,
           },
           unit_amount: Math.round(item.productsId.price * 100),
         },
@@ -338,7 +340,7 @@ module.exports = {
       success_url: `http://localhost:3000/api/users/payment/success`, // Replace with your success URL
       cancel_url: "http://localhost:3000/api/users/payment/cancel", // Replace with your cancel URL
     });
-    console.log(session)
+    console.log(session);
     if (!session) {
       return res.json({
         status: "Failure",
@@ -355,10 +357,10 @@ module.exports = {
       message: "Strip  payment session created successfully",
       url: session.url,
     });
-  },  
+  },
   success: async (req, res) => {
     const { user, Id, session } = Svalue;
-    console.log("uuuu:-",Svalue)
+    console.log("uuuu:-", Svalue);
     const userId = user.id;
     const cartItems = user.cart;
     const productitems = cartItems.map((item) => item.productsId);
@@ -396,10 +398,33 @@ module.exports = {
       });
     }
   },
-  cancel:async(req,res)=>{
+  cancel: async (req, res) => {
     res.status(204).json({
-      status:"no content",
-      message:"payment cancelled"
-    })
-  }
+      status: "no content",
+      message: "payment cancelled",
+    });
+  },
+  orderDetails: async (req, res) => {
+    const userId = req.params.id;
+    const user = await userschema.findOne({ _id: userId }).populate("orders");
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "user not found",
+      });
+    }
+    const orderProducts = user.orders;
+    if (orderProducts.length === 0) {
+      return res.status(404).json({
+        message: "don't have any products",
+        data: [],
+      });
+    }
+    const orderItems = await order.find({ _id:{ $in: orderProducts }}).populate("products");
+    return res.status(200).json({
+      status: "success",
+      message: "order product details found",
+      data: orderItems,
+    });
+  },
 };

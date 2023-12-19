@@ -21,7 +21,7 @@ router
 .post("/:id/payment",TryCatchMiddleware(Usercontroller.payment))
 .get("/payment/success",TryCatchMiddleware(Usercontroller.success))
 .post("/payment/cancel",TryCatchMiddleware(Usercontroller.cancel))
-
+.get("/:id/orders",TryCatchMiddleware(Usercontroller.orderDetails))
 
 
 module.exports = router;    

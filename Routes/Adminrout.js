@@ -15,6 +15,9 @@ router
   .post("/add",imageuploading, TrycatchMiddleware(admincontroller.addProduct))
   .delete("/delete/:id", TrycatchMiddleware(admincontroller.deleteproduct))
   .get("/view", TrycatchMiddleware(admincontroller.allproducts))
-  .put("/update", TrycatchMiddleware(admincontroller.adminUpdate));
+  .put("/update", TrycatchMiddleware(admincontroller.adminUpdate))
+  .get("/orders",TrycatchMiddleware(admincontroller.adminOrderDetails))
+  .get("/status",TrycatchMiddleware(admincontroller.status))
+
 
 module.exports = router;
